@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('debugMochaTest', () => {
-		const outDir = vscode.workspace.getConfiguration().get('launch.mocha.ts.outDir', 'out');
+	context.subscriptions.push(vscode.commands.registerCommand('launchMochaTests.debugTest', () => {
+		const outDir = vscode.workspace.getConfiguration().get('launchMochaTests.ts.outDir', 'out');
 		const filePath = getFilePath(outDir);
 		if (filePath) {
 			vscode.commands.executeCommand('vscode.startDebug', getLaunchConfig(filePath, outDir));

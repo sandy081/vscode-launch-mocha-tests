@@ -42,7 +42,7 @@
 		"configuration": {
 			"title": "Launch Mocha Tests",
 			"properties": {
-				"launch.mocha.ts.outDir": {
+				"launchMochaTests.ts.outDir": {
 					"type": "string",
 					"default": "out",
 					"description": "out directory (relative to workspace) for typescript files."
