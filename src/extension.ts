@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('launchMochaTests.debugTest', () => {
-		const outDir = vscode.workspace.getConfiguration().get('launchMochaTests.ts.outDir', 'out');
+		const outDir = vscode.workspace.getConfiguration().get<string>('launchMochaTests.ts.outDir');
 		const filePath = getFilePath(outDir);
 		if (filePath) {
 			vscode.commands.executeCommand('vscode.startDebug', getLaunchConfig(filePath, outDir));
@@ -19,7 +19,7 @@ function getFilePath(outDir: string): string {
 	}
 	const filePath = activeEditor.document.uri.fsPath;
 	const rootpath = vscode.workspace.rootPath;
-	const jsFile = filePath.endsWith('.ts') ? rootpath + outDir + filePath.substring(rootpath.length + 4, filePath.length - 3) + '.js' : filePath;
+	const jsFile = filePath.endsWith('.ts') ? rootpath + '/' + outDir + filePath.substring(rootpath.length + 4, filePath.length - 3) + '.js' : filePath;
 	if (jsFile.endsWith('.js')) {
 		return jsFile;
 	}
