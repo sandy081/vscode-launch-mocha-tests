@@ -10,6 +10,24 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"mocha",
+		"test"
+	],
+	"galleryBanner": {
+		"color": "#f0efe7",
+		"theme": "light"
+	},
+	"icon": "mocha.svg",
+	"homepage": "https://github.com/sandy081/vscode-launch-mocha-tests/blob/master/README.md",
+	"bugs": {
+		"url": "https://github.com/sandy081/vscode-launch-mocha-tests/issues"
+	},
+	"license": "SEE LICENSE IN LICENSE.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sandy081/vscode-launch-mocha-tests"
+	},
 	"activationEvents": [
 		"onCommand:launchMochaTests.debugTest"
 	],
