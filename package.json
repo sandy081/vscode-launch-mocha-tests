@@ -4,8 +4,9 @@
 	"description": "Launch Mocha tests",
 	"version": "0.0.2",
 	"publisher": "sandy081",
+	"enableProposedApi": true,
 	"engines": {
-		"vscode": "^1.5.0"
+		"vscode": "^1.17.0"
 	},
 	"categories": [
 		"Other"

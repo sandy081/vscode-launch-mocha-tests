@@ -3,23 +3,36 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('launchMochaTests.debugTest', () => {
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			vscode.window.showInformationMessage("No file opened");
+			return;
+		}
+		const workspaceFolder = vscode.workspace.getWorkspaceFolder(activeEditor.document.uri);
+		if (!workspaceFolder) {
+			vscode.window.showInformationMessage("No Workspace Folder found");
+			return;
+		}
 		const outDir = vscode.workspace.getConfiguration().get<string>('launchMochaTests.ts.outDir');
-		const filePath = getFilePath(outDir);
+		const filePath = getFilePath(vscode.window.activeTextEditor.document.fileName, outDir, workspaceFolder);
 		if (filePath) {
-			vscode.commands.executeCommand('vscode.startDebug', getLaunchConfig(filePath, outDir));
+			vscode.debug.startDebugging(workspaceFolder, getLaunchConfig(filePath, outDir))
+				.then(started => {
+					if (started) {
+						const activeDebugSession = vscode.debug.activeDebugSession;
+						vscode.debug.onDidTerminateDebugSession(e => {
+							if (e.id === activeDebugSession.id) {
+								e.customRequest('workbench.debug.panel.action.clearReplAction');
+							}
+						});
+					}
+				});
 		}
 	}));
 }
 
-function getFilePath(outDir: string): string {
-	const activeEditor = vscode.window.activeTextEditor;
-	if (!activeEditor) {
-		vscode.window.showInformationMessage("No file opened");
-		return null;
-	}
-	const filePath = activeEditor.document.uri.fsPath;
-	const rootpath = vscode.workspace.rootPath;
-	const jsFile = filePath.endsWith('.ts') ? rootpath + '/' + outDir + filePath.substring(rootpath.length + 4, filePath.length - 3) + '.js' : filePath;
+function getFilePath(filePath: string, outDir: string, workspaceFolder: vscode.WorkspaceFolder): string {
+	const jsFile = filePath.endsWith('.ts') ? workspaceFolder.uri.fsPath + '/' + outDir + filePath.substring(workspaceFolder.uri.fsPath.length + 4, filePath.length - 3) + '.js' : filePath;
 	if (jsFile.endsWith('.js')) {
 		return jsFile;
 	}
@@ -32,7 +45,8 @@ function getLaunchConfig(file: string, outDir: string): any {
 		"name": "Launch Test - " + file,
 		"type": "node",
 		"request": "launch",
-		"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+		"protocol": "inspector",
+		"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
 		"runtimeExecutable": "${execPath}",
 		"stopOnEntry": false,
 		"args": [
@@ -41,17 +55,18 @@ function getLaunchConfig(file: string, outDir: string): any {
 			"--run",
 			file
 		],
-		"cwd": "${workspaceRoot}",
+		"cwd": "${workspaceFolder}",
 		"runtimeArgs": [],
 		"env": {
 			"ELECTRON_RUN_AS_NODE": "true"
 		},
 		"sourceMaps": true,
-		"outDir": "${workspaceRoot}/" + outDir
+		"outFiles": [
+			"${workspaceFolder}/out/**/*.js"
+		]
 	}
 	return launch;
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
 }
